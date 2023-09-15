@@ -17,9 +17,10 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/titleLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="8dp"
+                android:elevation="8sp"
                 android:background="@drawable/bottom_round_8"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -50,11 +51,11 @@
                     android:id="@+id/groupTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10sp"
-                    android:layout_marginBottom="20sp"
+                    android:layout_marginTop="15sp"
+                    android:layout_marginBottom="10sp"
                     android:text="@string/group_title"
                     android:textColor="@color/black"
-                    android:textSize="45sp"
+                    android:textSize="30sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@id/backView"
@@ -62,6 +63,18 @@
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/gameRV"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@null"
+                app:layout_constraintTop_toBottomOf="@id/titleLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/game_list_item"
+                tools:itemCount="7"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
