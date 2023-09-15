@@ -5,5 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.SocketTeamProject" parent="Base.Theme.SocketTeamProject" />
+    <style name="Theme.SocketTeamProject" parent="Base.Theme.SocketTeamProject">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
 </resources>
