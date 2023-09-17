@@ -10,5 +10,11 @@
     <!-- GameSearchResultActivity -->
     <string name="group_title">가톨릭대</string>
 
+    <!-- GameActivity -->
+    <string name="laon">라온</string>
+    <string name="bisang">비상</string>
+    <string name="versus">VS</string>
+    <string name="firstHalf">전반전</string>
+    <string name="secondHalf">후반전</string>
 
 </resources>
