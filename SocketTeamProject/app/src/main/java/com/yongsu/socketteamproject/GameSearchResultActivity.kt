@@ -1,5 +1,6 @@
 package com.yongsu.socketteamproject
 
+import android.content.Intent
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -27,6 +28,11 @@ class GameSearchResultActivity : AppCompatActivity() {
             gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
             //gameRV.addItemDecoration(GameListAdapterDecoration())
             adapter.submitList(DummyDate())
+
+            floatingBtn.setOnClickListener {
+                val intent = Intent(this@GameSearchResultActivity, GameActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
