@@ -245,9 +245,50 @@
                 app:layout_constraintTop_toBottomOf="@id/titleLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/messageLayout"
                 tools:listitem="@layout/message_list_item"
                 tools:itemCount="8"/>
+
+            <LinearLayout
+                android:id="@+id/messageLayout"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/light_gray_round_16dp">
+
+                    <EditText
+                        android:id="@+id/messageET"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:background="@null"
+                        android:hint="문자를 입력하세요"
+                        android:textSize="18sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+
+                    <ImageView
+                        android:id="@+id/sendView"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        app:srcCompat="@drawable/baseline_send_24"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
