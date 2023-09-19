@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yongsu.socketteamproject.adapter.GameListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameSearchResultBinding
+import com.yongsu.socketteamproject.viewmodel.GameListItem
 
 class GameSearchResultActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.yongsu.socketteamproject
+package com.yongsu.socketteamproject.viewmodel
 
 data class GameListItem(
     val id : Int,

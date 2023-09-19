@@ -82,7 +82,7 @@
                 app:cardCornerRadius="40dp"
                 app:cardElevation="8dp"
                 app:cardBackgroundColor="#9933FF"
-                app:contentPadding="5dp"
+                app:contentPadding="3dp"
                 android:layout_marginEnd="15sp"
                 android:layout_marginBottom="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
