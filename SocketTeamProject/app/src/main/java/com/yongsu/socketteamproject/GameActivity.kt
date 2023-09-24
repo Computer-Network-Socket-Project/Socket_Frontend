@@ -20,6 +20,7 @@ class GameActivity : AppCompatActivity() {
     private val isAdmin = true
     private var isSoccer = false
     private var isSave = false
+    private var whichTeam = 0
 
     private val MessageAdapter = MessageListAdapter()
 
@@ -88,12 +89,14 @@ class GameActivity : AppCompatActivity() {
                 gameStatusTV.text = "전반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
+                MessageAdapter.submitList(FirstDummyDate())
             }
             secondHalfTV.setOnClickListener {
                 isFirstHalf = false
                 gameStatusTV.text = "후반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
+                MessageAdapter.submitList(SecondDummyDate())
             }
 
             // 리사이클러뷰
@@ -102,21 +105,39 @@ class GameActivity : AppCompatActivity() {
             manager.reverseLayout = true
             manager.stackFromEnd = true
             gameRV.layoutManager = manager
-            MessageAdapter.submitList(DummyDate())
+            if(isFirstHalf){
+                MessageAdapter.submitList(FirstDummyDate())
+            }else{
+                MessageAdapter.submitList(SecondDummyDate())
+            }
+
+            teamMessage.text = firstTeam.text.toString()
+            teamMessage.setOnClickListener {
+                if(whichTeam % 3 == 0){
+                    teamMessage.text = firstTeam.text.toString()
+                    whichTeam++
+                } else if(whichTeam % 3 == 1){
+                    teamMessage.text = secondTeam.text.toString()
+                    whichTeam++
+                } else{
+                    teamMessage.text = "X"
+                    whichTeam = 0
+                }
+
+            }
+
+
         }
     }
 
-    private fun DummyDate() : ArrayList<MessageListItem>{
-        val dummy1 = MessageListItem(1, "경기 시작합니다!")
+    private fun FirstDummyDate() : ArrayList<MessageListItem>{
+        val dummy1 = MessageListItem(1, "전반전 시작합니다!")
         val dummy2 = MessageListItem(2, "비상, 다리우스의 환성적인 덩크")
         val dummy3 = MessageListItem(3, "비상, 아무무 투입, 드레이븐 교체")
         val dummy4 = MessageListItem(4, "라온, 이회장의 그림같은 3점슛")
         val dummy5 = MessageListItem(5, "비상, 유회장의 파리채 블로킹")
         val dummy6 = MessageListItem(6, "라온, 피즈의 돌파 레이업")
         val dummy7 = MessageListItem(7, "라온, 피즈의 앤드원!!")
-
-
-
 
         val arr = ArrayList<MessageListItem>()
         arr.add(dummy1)
@@ -125,6 +146,28 @@ class GameActivity : AppCompatActivity() {
         arr.add(dummy4)
         arr.add(dummy5)
         arr.add(dummy6)
+        arr.add(dummy7)
+
+        return arr
+    }
+
+    private fun SecondDummyDate() : ArrayList<MessageListItem>{
+        val dummy1 = MessageListItem(1, "후반전 시작합니다!")
+        val dummy2 = MessageListItem(2, "라온, 벨베스의 안아줘요")
+        val dummy3 = MessageListItem(3, "라온, 벨코즈 파울 아웃, 그브 투입")
+        val dummy4 = MessageListItem(4, "비상, 임난쟁의 딥쓰리!!")
+        val dummy5 = MessageListItem(5, "비상, 아카시의 앵클 브레이커")
+        val dummy6 = MessageListItem(6, "라온, 람머스의 구른다")
+        val dummy7 = MessageListItem(7, "라온, 리볼버의 와웅")
+
+        val arr = ArrayList<MessageListItem>()
+        arr.add(dummy1)
+        arr.add(dummy2)
+        arr.add(dummy3)
+        arr.add(dummy4)
+        arr.add(dummy5)
+        arr.add(dummy6)
+        arr.add(dummy7)
 
         return arr
     }
