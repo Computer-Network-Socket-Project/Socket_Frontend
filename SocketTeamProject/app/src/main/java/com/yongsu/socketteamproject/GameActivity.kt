@@ -1,15 +1,27 @@
 package com.yongsu.socketteamproject
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameBinding
+import com.yongsu.socketteamproject.viewmodel.GameListItem
+import com.yongsu.socketteamproject.viewmodel.MessageListItem
 
 class GameActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameBinding
 
     private var isFirstHalf = true
+    private val isAdmin = true
+    private var isSoccer = false
+    private var isSave = false
+
+    private val MessageAdapter = MessageListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,6 +32,35 @@ class GameActivity : AppCompatActivity() {
 
     private fun initView(){
         with(binding){
+            // 뒤로 가기
+            backView.setOnClickListener {
+                // 저장이 된 경우에만 finish()로 바로 넘어감
+                // admin이 아니면 저장 불가
+                if(isSave && !isAdmin){ // 저장이 됨
+                    finish()
+                }else{      // 저장 안됨
+                    AlertDialog.Builder(this@GameActivity)
+                        .setTitle("${firstTeam.text} vs ${secondTeam.text}")
+                        .setMessage("중계를 등록하시겠습니까?\n(등록하지 않은 중계는 영구 삭제됩니다.)")
+                        .setPositiveButton("네", object : DialogInterface.OnClickListener{
+                            override fun onClick(dialog: DialogInterface, which: Int){
+                                Toast.makeText(applicationContext, "등록되었습니다.", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                        })
+                        .setNegativeButton("아니오", object : DialogInterface.OnClickListener{
+                            override fun onClick(dialog: DialogInterface, which: Int){
+                                Toast.makeText(applicationContext, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                        })
+                        .create()
+                        .show()
+
+                }
+            }
+
+            // 점수 올리고 내리고
             firstTeamUp.setOnClickListener {
                 val addNum = firstTeamScore.text.toString().toInt() + 1
                 firstTeamScore.setText(addNum.toString())
@@ -41,6 +82,7 @@ class GameActivity : AppCompatActivity() {
                 }
             }
 
+            // 전반 후반
             firstHalfTV.setOnClickListener {
                 isFirstHalf = true
                 gameStatusTV.text = "전반전"
@@ -54,6 +96,36 @@ class GameActivity : AppCompatActivity() {
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
             }
 
+            // 리사이클러뷰
+            gameRV.adapter = MessageAdapter
+            val manager = LinearLayoutManager(this@GameActivity)
+            manager.reverseLayout = true
+            manager.stackFromEnd = true
+            gameRV.layoutManager = manager
+            MessageAdapter.submitList(DummyDate())
         }
+    }
+
+    private fun DummyDate() : ArrayList<MessageListItem>{
+        val dummy1 = MessageListItem(1, "경기 시작합니다!")
+        val dummy2 = MessageListItem(2, "비상, 다리우스의 환성적인 덩크")
+        val dummy3 = MessageListItem(3, "비상, 아무무 투입, 드레이븐 교체")
+        val dummy4 = MessageListItem(4, "라온, 이회장의 그림같은 3점슛")
+        val dummy5 = MessageListItem(5, "비상, 유회장의 파리채 블로킹")
+        val dummy6 = MessageListItem(6, "라온, 피즈의 돌파 레이업")
+        val dummy7 = MessageListItem(7, "라온, 피즈의 앤드원!!")
+
+
+
+
+        val arr = ArrayList<MessageListItem>()
+        arr.add(dummy1)
+        arr.add(dummy2)
+        arr.add(dummy3)
+        arr.add(dummy4)
+        arr.add(dummy5)
+        arr.add(dummy6)
+
+        return arr
     }
 }
