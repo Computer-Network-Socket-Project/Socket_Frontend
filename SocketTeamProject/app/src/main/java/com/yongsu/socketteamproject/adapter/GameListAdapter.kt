@@ -6,12 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.yongsu.socketteamproject.GameListClickListener
 import com.yongsu.socketteamproject.viewmodel.GameListItem
 import com.yongsu.socketteamproject.R
 import com.yongsu.socketteamproject.databinding.GameListItemBinding
 
 
-class GameListAdapter : ListAdapter<GameListItem, GameListAdapter.GameListViewHolder>(DiffCallback) {
+class GameListAdapter(private val gameListClickListener: GameListClickListener) :
+    ListAdapter<GameListItem, GameListAdapter.GameListViewHolder>(DiffCallback) {
 
     companion object{
         private val DiffCallback = object : DiffUtil.ItemCallback<GameListItem>(){
@@ -40,9 +42,12 @@ class GameListAdapter : ListAdapter<GameListItem, GameListAdapter.GameListViewHo
             if(!gameListItem.isOnAir){
                 binding.onAirView.setVisibility(View.GONE)
             }
+
+            binding.goods.setOnClickListener {
+                gameListClickListener?.onGameListTouch(adapterPosition)
+            }
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameListViewHolder {
         val binding = GameListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -52,6 +57,5 @@ class GameListAdapter : ListAdapter<GameListItem, GameListAdapter.GameListViewHo
     override fun onBindViewHolder(holder: GameListViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
 
 }

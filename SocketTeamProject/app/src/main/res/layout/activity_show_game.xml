@@ -10,7 +10,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".GameActivity">
+        tools:context=".ShowGameActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -38,14 +38,14 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
 
-                <EditText
+                <TextView
                     android:id="@+id/titleTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10sp"
                     android:background="@null"
                     android:gravity="center"
-                    android:hint="제목을 입력해주세요."
+                    android:text="23년 바스타즈배 농구대회"
                     android:textColor="@color/black"
                     android:textSize="25sp"
                     android:textStyle="bold"
@@ -63,14 +63,14 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/baseline_menu_24" />
 
-                <EditText
+                <TextView
                     android:id="@+id/firstTeam"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20sp"
                     android:layout_marginTop="10sp"
                     android:background="@null"
-                    android:hint="1팀"
+                    android:text="1팀"
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     android:textStyle="bold"
@@ -91,14 +91,14 @@
                     app:layout_constraintStart_toStartOf="@+id/gameStatusTV"
                     app:layout_constraintTop_toTopOf="@id/firstTeam" />
 
-                <EditText
+                <TextView
                     android:id="@+id/secondTeam"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20sp"
                     android:gravity="right"
                     android:background="@null"
-                    android:hint="2팀"
+                    android:text="2팀"
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     android:textStyle="bold"
@@ -106,7 +106,7 @@
                     app:layout_constraintStart_toEndOf="@+id/versusTv"
                     app:layout_constraintTop_toTopOf="@id/firstTeam" />
 
-                <EditText
+                <TextView
                     android:id="@+id/firstTeamScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/firstTeam" />
 
-                <EditText
+                <TextView
                     android:id="@+id/secondTeamScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -147,78 +147,18 @@
                     app:layout_constraintStart_toEndOf="@+id/firstTeamScore"
                     app:layout_constraintTop_toTopOf="@id/firstTeamScore" />
 
-                <LinearLayout
-                    android:id="@+id/firstTeamBoardLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/scoreboard_background"
-                    android:layout_marginTop="10sp"
-                    app:layout_constraintTop_toBottomOf="@id/firstTeamScore"
-                    app:layout_constraintStart_toStartOf="@id/firstTeamScore"
-                    app:layout_constraintEnd_toEndOf="@id/firstTeamScore">
-
-                    <ImageView
-                        android:id="@+id/firstTeamDown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingVertical="5sp"
-                        app:srcCompat="@drawable/baseline_keyboard_arrow_down_24"/>
-
-                    <View
-                        android:layout_width="2dp"
-                        android:layout_height="50sp"
-                        android:background="@color/black"/>
-
-                    <ImageView
-                        android:id="@+id/firstTeamUp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingVertical="5sp"
-                        app:srcCompat="@drawable/baseline_keyboard_arrow_up_24"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/secondTeamBoardLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/scoreboard_background"
-                    app:layout_constraintTop_toTopOf="@id/firstTeamBoardLayout"
-                    app:layout_constraintStart_toStartOf="@id/secondTeamScore"
-                    app:layout_constraintEnd_toEndOf="@id/secondTeamScore">
-
-                    <ImageView
-                        android:id="@+id/secondTeamDown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingVertical="5sp"
-                        app:srcCompat="@drawable/baseline_keyboard_arrow_down_24"/>
-
-                    <View
-                        android:layout_width="2dp"
-                        android:layout_height="50sp"
-                        android:background="@color/black"/>
-
-                    <ImageView
-                        android:id="@+id/secondTeamUp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingVertical="5sp"
-                        app:srcCompat="@drawable/baseline_keyboard_arrow_up_24"/>
-
-                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/statusBoardLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5sp"
+                    android:layout_marginHorizontal="30sp"
+                    android:layout_marginTop="20sp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="@+id/firstTeamBoardLayout"
-                    app:layout_constraintEnd_toStartOf="@id/secondTeamBoardLayout"
-                    app:layout_constraintStart_toEndOf="@id/firstTeamBoardLayout"
-                    app:layout_constraintTop_toTopOf="@+id/firstTeamBoardLayout">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/gameStatusTV">
 
                     <TextView
                         android:id="@+id/firstHalfTV"
@@ -228,7 +168,7 @@
                         android:background="@drawable/left_round_26"
                         android:gravity="center"
                         android:layout_marginStart="3sp"
-                        android:text="전"
+                        android:text="전반전"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -245,7 +185,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/right_round_26_white"
-                        android:text="후"
+                        android:text="후반전"
                         android:layout_marginEnd="3sp"
                         android:textColor="@color/black"
                         android:textSize="20sp"
@@ -264,58 +204,9 @@
                 app:layout_constraintTop_toBottomOf="@id/titleLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/messageLayout"
+                app:layout_constraintBottom_toBottomOf="parent"
                 tools:listitem="@layout/message_list_item"
                 tools:itemCount="8"/>
-
-            <LinearLayout
-                android:id="@+id/messageLayout"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:paddingVertical="10dp"
-                android:paddingHorizontal="10dp"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/light_gray_round_16dp">
-
-                    <TextView
-                        android:id="@+id/teamMessage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="3.5"
-                        android:gravity="center"
-                        android:text="1팀"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"/>
-
-                    <EditText
-                        android:id="@+id/messageET"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@null"
-                        android:hint="문자를 입력하세요"
-                        android:textSize="14sp"
-                        android:textColor="@color/black" />
-
-                    <ImageView
-                        android:id="@+id/sendView"
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        app:srcCompat="@drawable/baseline_send_24"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

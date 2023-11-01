@@ -6,13 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.yongsu.socketteamproject.GameListClickListener
 import com.yongsu.socketteamproject.R
 import com.yongsu.socketteamproject.databinding.GameListItemBinding
 import com.yongsu.socketteamproject.databinding.MessageListItemBinding
 import com.yongsu.socketteamproject.viewmodel.GameListItem
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 
-class MessageListAdapter : ListAdapter<MessageListItem, MessageListAdapter.MessageListViewHolder>(DiffCallback)  {
+class MessageListAdapter:
+    ListAdapter<MessageListItem, MessageListAdapter.MessageListViewHolder>(DiffCallback)  {
 
     companion object{
         private val DiffCallback = object : DiffUtil.ItemCallback<MessageListItem>(){
@@ -29,6 +31,7 @@ class MessageListAdapter : ListAdapter<MessageListItem, MessageListAdapter.Messa
     inner class MessageListViewHolder(private val binding : MessageListItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(MessageListItem: MessageListItem){
             binding.messageTV.text = MessageListItem.message
+
         }
     }
 
@@ -40,5 +43,7 @@ class MessageListAdapter : ListAdapter<MessageListItem, MessageListAdapter.Messa
     override fun onBindViewHolder(holder: MessageListViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+
 
 }

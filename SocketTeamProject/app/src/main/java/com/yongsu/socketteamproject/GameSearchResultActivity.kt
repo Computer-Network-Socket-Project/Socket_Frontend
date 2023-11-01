@@ -15,7 +15,7 @@ import com.yongsu.socketteamproject.viewmodel.GameListItem
 class GameSearchResultActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameSearchResultBinding
-    private val adapter = GameListAdapter()
+    private val adapter = GameListAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game_search_result)

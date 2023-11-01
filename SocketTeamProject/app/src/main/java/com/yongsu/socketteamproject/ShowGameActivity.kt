@@ -1,7 +1,6 @@
 package com.yongsu.socketteamproject
 
 import android.content.DialogInterface
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -9,13 +8,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
-import com.yongsu.socketteamproject.databinding.ActivityGameBinding
-import com.yongsu.socketteamproject.viewmodel.GameListItem
+import com.yongsu.socketteamproject.databinding.ActivityShowGameBinding
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 
-class GameActivity : AppCompatActivity(), GameListClickListener {
+class ShowGameActivity : AppCompatActivity() {
 
-    private lateinit var binding : ActivityGameBinding
+    private lateinit var binding : ActivityShowGameBinding
+
+    private val MessageAdapter = MessageListAdapter()
 
     private var isFirstHalf = true
     private val isAdmin = true
@@ -23,65 +23,19 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
     private var isSave = false
     private var whichTeam = 0
 
-    private val MessageAdapter = MessageListAdapter()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_show_game)
 
         initView()
     }
 
     private fun initView(){
         with(binding){
-            // 뒤로 가기
+
+            // 뒤로가기
             backView.setOnClickListener {
-                // 저장이 된 경우에만 finish()로 바로 넘어감
-                // admin이 아니면 저장 불가
-                if(isSave && !isAdmin){ // 저장이 됨
-                    finish()
-                }else{      // 저장 안됨
-                    AlertDialog.Builder(this@GameActivity)
-                        .setTitle("${firstTeam.text} vs ${secondTeam.text}")
-                        .setMessage("중계를 등록하시겠습니까?\n(등록하지 않은 중계는 영구 삭제됩니다.)")
-                        .setPositiveButton("네", object : DialogInterface.OnClickListener{
-                            override fun onClick(dialog: DialogInterface, which: Int){
-                                Toast.makeText(applicationContext, "등록되었습니다.", Toast.LENGTH_SHORT).show()
-                                finish()
-                            }
-                        })
-                        .setNegativeButton("아니오", object : DialogInterface.OnClickListener{
-                            override fun onClick(dialog: DialogInterface, which: Int){
-                                Toast.makeText(applicationContext, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                                finish()
-                            }
-                        })
-                        .create()
-                        .show()
-
-                }
-            }
-
-            // 점수 올리고 내리고
-            firstTeamUp.setOnClickListener {
-                val addNum = firstTeamScore.text.toString().toInt() + 1
-                firstTeamScore.setText(addNum.toString())
-            }
-            firstTeamDown.setOnClickListener {
-                val addNum = firstTeamScore.text.toString().toInt() - 1
-                if(addNum >= 0){
-                    firstTeamScore.setText(addNum.toString())
-                }
-            }
-            secondTeamUp.setOnClickListener {
-                val addNum = secondTeamScore.text.toString().toInt() + 1
-                secondTeamScore.setText(addNum.toString())
-            }
-            secondTeamDown.setOnClickListener {
-                val addNum = secondTeamScore.text.toString().toInt() - 1
-                if(addNum >= 0){
-                    secondTeamScore.setText(addNum.toString())
-                }
+                finish()
             }
 
             // 전반 후반
@@ -102,7 +56,7 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
 
             // 리사이클러뷰
             gameRV.adapter = MessageAdapter
-            val manager = LinearLayoutManager(this@GameActivity)
+            val manager = LinearLayoutManager(this@ShowGameActivity)
             manager.reverseLayout = true
             manager.stackFromEnd = true
             gameRV.layoutManager = manager
@@ -110,21 +64,6 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
                 MessageAdapter.submitList(FirstDummyDate())
             }else{
                 MessageAdapter.submitList(SecondDummyDate())
-            }
-
-            teamMessage.text = firstTeam.text.toString()
-            teamMessage.setOnClickListener {
-                if(whichTeam % 3 == 0){
-                    teamMessage.text = firstTeam.text.toString()
-                    whichTeam++
-                } else if(whichTeam % 3 == 1){
-                    teamMessage.text = secondTeam.text.toString()
-                    whichTeam++
-                } else{
-                    teamMessage.text = "X"
-                    whichTeam = 0
-                }
-
             }
 
         }
@@ -170,10 +109,5 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
         arr.add(dummy7)
 
         return arr
-    }
-
-    override fun onGameListTouch(position: Int) {
-        val intent = Intent(this@GameActivity, ShowGameActivity::class.java)
-        startActivity(intent)
     }
 }
