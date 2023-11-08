@@ -3,6 +3,9 @@ package com.yongsu.socketteamproject
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -10,8 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityShowGameBinding
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
+import com.yongsu.socketteamproject.viewmodel.ViewerClientThread
 
 class ShowGameActivity : AppCompatActivity() {
+    private val handler = Handler(Looper.getMainLooper())
 
     private lateinit var binding : ActivityShowGameBinding
 
@@ -26,6 +31,9 @@ class ShowGameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show_game)
+
+        val viewerThread = ViewerClientThread(this@ShowGameActivity)
+        viewerThread.start()
 
         initView()
     }
@@ -66,6 +74,30 @@ class ShowGameActivity : AppCompatActivity() {
                 MessageAdapter.submitList(SecondDummyDate())
             }
 
+        }
+    }
+
+    fun receiveMatchInfo(title: String, team1: String, team2: String) {
+        binding.titleTV.text = title
+        binding.firstTeam.text = team1
+        binding.secondTeam.text = team2
+    }
+    fun receiveScore(firstScore: Int, secondScore: Int) {
+        binding.firstTeamScore.text = firstScore.toString()
+        binding.secondTeamScore.text = secondScore.toString()
+    }
+    fun receiveHalfStatus(gameStatus: Boolean) {
+        if(gameStatus){
+            binding.gameStatusTV.text = "전반전"
+            binding.firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
+            binding.secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
+            MessageAdapter.submitList(FirstDummyDate())
+        }else{
+            isFirstHalf = false
+            binding.gameStatusTV.text = "후반전"
+            binding.firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
+            binding.secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
+            MessageAdapter.submitList(SecondDummyDate())
         }
     }
 
@@ -110,4 +142,6 @@ class ShowGameActivity : AppCompatActivity() {
 
         return arr
     }
+
+
 }

@@ -4,6 +4,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -12,6 +15,12 @@ import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameBinding
 import com.yongsu.socketteamproject.viewmodel.GameListItem
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class GameActivity : AppCompatActivity(), GameListClickListener {
 
@@ -23,16 +32,52 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
     private var isSave = false
     private var whichTeam = 0
 
+    // about socket
+    private lateinit var createrClientThread: CreaterClientThread
+    var mHandler: Handler? = null
+    var socket: Socket? = null
+    var outstream: DataOutputStream? = null
+    var instream: DataInputStream? = null
+    var newip: String? = "192.168.44.195"
+    var port = 9999
+
     private val MessageAdapter = MessageListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
 
-        initView()
+        // 팀 선택해서 올리기
+        binding.teamMessage.text = binding.firstTeam.text.toString()
+        binding.teamMessage.setOnClickListener {
+            if(whichTeam % 3 == 0){
+                binding.teamMessage.text = binding.firstTeam.text.toString()
+                whichTeam++
+            } else if(whichTeam % 3 == 1){
+                binding.teamMessage.text = binding.secondTeam.text.toString()
+                whichTeam++
+            } else{
+                binding.teamMessage.text = "X"
+                whichTeam = 0
+            }
+        }
+
+        createrClientThread = CreaterClientThread()
+        createrClientThread.start()
+
+        // 제목, 팀명 업데이트
+        var title = binding.titleTV.text.toString()
+        var team1 = binding.firstTeam.text.toString()
+        var team2 = binding.secondTeam.text.toString()
+        createrClientThread.sendMatchInfo(title, team1, team2)
+
+        initBack()
+        initGameStatus()
+        initMessage()
+        initScore()
     }
 
-    private fun initView(){
+    private fun initBack(){
         with(binding){
             // 뒤로 가기
             backView.setOnClickListener {
@@ -58,10 +103,13 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
                         })
                         .create()
                         .show()
-
                 }
             }
+        }
+    }
 
+    private fun initScore(){
+        with(binding){
             // 점수 올리고 내리고
             firstTeamUp.setOnClickListener {
                 val addNum = firstTeamScore.text.toString().toInt() + 1
@@ -84,6 +132,15 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
                 }
             }
 
+            // 모든 팀의 점수를 update
+            val fTeamScore = firstTeamScore.text.toString().toInt()
+            val sTeamScore = secondTeamScore.text.toString().toInt()
+            createrClientThread.updateScore(fTeamScore, sTeamScore)
+        }
+    }
+
+    private fun initGameStatus(){
+        with(binding){
             // 전반 후반
             firstHalfTV.setOnClickListener {
                 isFirstHalf = true
@@ -100,6 +157,13 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
                 MessageAdapter.submitList(SecondDummyDate())
             }
 
+            // 전후반 상태 전달
+            createrClientThread.setHalf(isFirstHalf)
+        }
+    }
+
+    private fun initMessage(){
+        with(binding){
             // 리사이클러뷰
             gameRV.adapter = MessageAdapter
             val manager = LinearLayoutManager(this@GameActivity)
@@ -111,22 +175,6 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
             }else{
                 MessageAdapter.submitList(SecondDummyDate())
             }
-
-            teamMessage.text = firstTeam.text.toString()
-            teamMessage.setOnClickListener {
-                if(whichTeam % 3 == 0){
-                    teamMessage.text = firstTeam.text.toString()
-                    whichTeam++
-                } else if(whichTeam % 3 == 1){
-                    teamMessage.text = secondTeam.text.toString()
-                    whichTeam++
-                } else{
-                    teamMessage.text = "X"
-                    whichTeam = 0
-                }
-
-            }
-
         }
     }
 
