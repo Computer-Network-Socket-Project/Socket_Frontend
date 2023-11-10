@@ -15,7 +15,7 @@ import com.yongsu.socketteamproject.viewmodel.GameListItem
 class GameSearchResultActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameSearchResultBinding
-    private val adapter = GameListAdapter(this)
+    private val adapter = GameListAdapter(DummyData())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game_search_result)
@@ -28,7 +28,14 @@ class GameSearchResultActivity : AppCompatActivity() {
             gameRV.adapter = adapter
             gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
             //gameRV.addItemDecoration(GameListAdapterDecoration())
-            adapter.submitList(DummyDate())
+
+            adapter.setGLClickListener(object: GameListAdapter.GameListClickListener{
+                override fun onGameListTouch(gameListItem: GameListItem) {
+                    val intent = Intent(this@GameSearchResultActivity, ShowGameActivity::class.java)
+                    startActivity(intent)
+                }
+
+            })
 
             floatingBtn.setOnClickListener {
                 val intent = Intent(this@GameSearchResultActivity, GameActivity::class.java)
@@ -37,7 +44,7 @@ class GameSearchResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun DummyDate() : ArrayList<GameListItem>{
+    private fun DummyData() : ArrayList<GameListItem>{
         val dummy1 = GameListItem(1, "2023년 총장배 농구대회", "라온", "비상",
             3, 7, "전반전", true, false, 3)
 

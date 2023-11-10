@@ -32,9 +32,10 @@ class ShowGameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show_game)
 
+        /*
         val viewerThread = ViewerClientThread(this@ShowGameActivity)
         viewerThread.start()
-
+         */
         initView()
     }
 

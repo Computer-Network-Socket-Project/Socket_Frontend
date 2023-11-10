@@ -1,16 +1,11 @@
 package com.yongsu.socketteamproject.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.yongsu.socketteamproject.GameListClickListener
-import com.yongsu.socketteamproject.R
-import com.yongsu.socketteamproject.databinding.GameListItemBinding
 import com.yongsu.socketteamproject.databinding.MessageListItemBinding
-import com.yongsu.socketteamproject.viewmodel.GameListItem
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 
 class MessageListAdapter:

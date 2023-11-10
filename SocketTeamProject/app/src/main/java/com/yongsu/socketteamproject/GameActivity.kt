@@ -22,7 +22,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class GameActivity : AppCompatActivity(), GameListClickListener {
+class GameActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameBinding
 
@@ -62,14 +62,17 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
             }
         }
 
+        /*
         createrClientThread = CreaterClientThread()
         createrClientThread.start()
+
+         */
 
         // 제목, 팀명 업데이트
         var title = binding.titleTV.text.toString()
         var team1 = binding.firstTeam.text.toString()
         var team2 = binding.secondTeam.text.toString()
-        createrClientThread.sendMatchInfo(title, team1, team2)
+        //createrClientThread.sendMatchInfo(title, team1, team2)
 
         initBack()
         initGameStatus()
@@ -135,7 +138,7 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
             // 모든 팀의 점수를 update
             val fTeamScore = firstTeamScore.text.toString().toInt()
             val sTeamScore = secondTeamScore.text.toString().toInt()
-            createrClientThread.updateScore(fTeamScore, sTeamScore)
+            //createrClientThread.updateScore(fTeamScore, sTeamScore)
         }
     }
 
@@ -158,7 +161,7 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
             }
 
             // 전후반 상태 전달
-            createrClientThread.setHalf(isFirstHalf)
+            //createrClientThread.setHalf(isFirstHalf)
         }
     }
 
@@ -220,8 +223,4 @@ class GameActivity : AppCompatActivity(), GameListClickListener {
         return arr
     }
 
-    override fun onGameListTouch(position: Int) {
-        val intent = Intent(this@GameActivity, ShowGameActivity::class.java)
-        startActivity(intent)
-    }
 }

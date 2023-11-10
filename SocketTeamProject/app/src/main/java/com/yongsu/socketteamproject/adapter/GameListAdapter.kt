@@ -3,28 +3,22 @@ package com.yongsu.socketteamproject.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.yongsu.socketteamproject.GameListClickListener
 import com.yongsu.socketteamproject.viewmodel.GameListItem
 import com.yongsu.socketteamproject.R
 import com.yongsu.socketteamproject.databinding.GameListItemBinding
 
 
-class GameListAdapter(private val gameListClickListener: GameListClickListener) :
-    ListAdapter<GameListItem, GameListAdapter.GameListViewHolder>(DiffCallback) {
+class GameListAdapter(private val gameList: ArrayList<GameListItem>) : RecyclerView.Adapter<GameListAdapter.GameListViewHolder>() {
 
-    companion object{
-        private val DiffCallback = object : DiffUtil.ItemCallback<GameListItem>(){
-            override fun areItemsTheSame(oldItem: GameListItem, newItem: GameListItem): Boolean {
-                return oldItem.id == newItem.id
-            }
+    interface GameListClickListener {
+        fun onGameListTouch(gameListItem: GameListItem)
+    }
 
-            override fun areContentsTheSame(oldItem: GameListItem, newItem: GameListItem): Boolean {
-                return oldItem == newItem
-            }
-        }
+    private lateinit var GLClickListener: GameListClickListener
+
+    fun setGLClickListener(itemClickListener: GameListClickListener) {
+        GLClickListener = itemClickListener
     }
 
     inner class GameListViewHolder(private val binding : GameListItemBinding) : RecyclerView.ViewHolder(binding.root){
@@ -42,20 +36,23 @@ class GameListAdapter(private val gameListClickListener: GameListClickListener) 
             if(!gameListItem.isOnAir){
                 binding.onAirView.setVisibility(View.GONE)
             }
-
-            binding.goods.setOnClickListener {
-                gameListClickListener?.onGameListTouch(adapterPosition)
-            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameListViewHolder {
         val binding = GameListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
         return GameListViewHolder(binding)
     }
 
+    override fun getItemCount(): Int = gameList.size
+
     override fun onBindViewHolder(holder: GameListViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(gameList[position])
+
+        holder.itemView.setOnClickListener {
+            GLClickListener.onGameListTouch(gameList[position])
+        }
     }
 
 }
