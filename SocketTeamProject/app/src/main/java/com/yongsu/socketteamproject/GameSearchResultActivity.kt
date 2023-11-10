@@ -4,18 +4,32 @@ import android.content.Intent
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yongsu.socketteamproject.adapter.GameListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameSearchResultBinding
+import com.yongsu.socketteamproject.retrofit.RetrofitInstance
+import com.yongsu.socketteamproject.retrofit.api.GameInterface
+import com.yongsu.socketteamproject.retrofit.model.GameInfoRes
 import com.yongsu.socketteamproject.viewmodel.GameListItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.IOException
 
 class GameSearchResultActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameSearchResultBinding
-    private val adapter = GameListAdapter(DummyData())
+    val arr = ArrayList<GameInfoRes>()
+    private val adapter = GameListAdapter(arr)
+
+    private val gameAPI = RetrofitInstance.getInstance().create(GameInterface::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game_search_result)
@@ -29,8 +43,23 @@ class GameSearchResultActivity : AppCompatActivity() {
             gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
             //gameRV.addItemDecoration(GameListAdapterDecoration())
 
+            lifecycleScope.launch{
+                try{
+                    Log.d("http통신", "일단 여기까지는")
+                    val response = withContext(Dispatchers.IO){
+                        gameAPI.getGameList()
+                    }
+                    Log.d("http통신", "온다는 말인데...")
+                    // 서버에서 받아온 값들을 모두 arr에 넣어줌
+                    arr.addAll(response)
+
+                }catch(e : IOException){
+                    Log.e("http통신", "$e")
+                }
+            }
+
             adapter.setGLClickListener(object: GameListAdapter.GameListClickListener{
-                override fun onGameListTouch(gameListItem: GameListItem) {
+                override fun onGameListTouch(gameListItem: GameInfoRes) {
                     val intent = Intent(this@GameSearchResultActivity, ShowGameActivity::class.java)
                     startActivity(intent)
                 }
@@ -44,35 +73,35 @@ class GameSearchResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun DummyData() : ArrayList<GameListItem>{
-        val dummy1 = GameListItem(1, "2023년 총장배 농구대회", "라온", "비상",
-            3, 7, "전반전", true, false, 3)
-
-        val dummy2 = GameListItem(2, "2023년 킥오프배 축구대회", "자과", "생과",
-            1, 3, "경기종료", false, true, 2)
-
-        val dummy3 = GameListItem(3, "2023년 킥오프배 축구대회", "컴공", "영문",
-            2, 1, "경기종료", false, true, 7)
-
-        val dummy4 = GameListItem(4, "2023년 바스타즈배 농구대회", "비상A", "비상B",
-            18, 6, "경기종료", false, false, 12)
-
-        val dummy5 = GameListItem(5, "2023년 바스타즈배 농구대회", "생생", "히든",
-            4, 20, "경기종료", false, false, 5)
-
-        val dummy6 = GameListItem(6, "2022년 총장배 축구대회", "교직원", "법정경",
-            2, 5, "경기종료", false, true, 2)
-
-        val arr = ArrayList<GameListItem>()
-        arr.add(dummy1)
-        arr.add(dummy2)
-        arr.add(dummy3)
-        arr.add(dummy4)
-        arr.add(dummy5)
-        arr.add(dummy6)
-
-        return arr
-    }
+//    private fun DummyData() : ArrayList<GameListItem>{
+//        val dummy1 = GameListItem(1, "2023년 총장배 농구대회", "라온", "비상",
+//            3, 7, "전반전", true, false, 3)
+//
+//        val dummy2 = GameListItem(2, "2023년 킥오프배 축구대회", "자과", "생과",
+//            1, 3, "경기종료", false, true, 2)
+//
+//        val dummy3 = GameListItem(3, "2023년 킥오프배 축구대회", "컴공", "영문",
+//            2, 1, "경기종료", false, true, 7)
+//
+//        val dummy4 = GameListItem(4, "2023년 바스타즈배 농구대회", "비상A", "비상B",
+//            18, 6, "경기종료", false, false, 12)
+//
+//        val dummy5 = GameListItem(5, "2023년 바스타즈배 농구대회", "생생", "히든",
+//            4, 20, "경기종료", false, false, 5)
+//
+//        val dummy6 = GameListItem(6, "2022년 총장배 축구대회", "교직원", "법정경",
+//            2, 5, "경기종료", false, true, 2)
+//
+//        val arr = ArrayList<GameListItem>()
+//        arr.add(dummy1)
+//        arr.add(dummy2)
+//        arr.add(dummy3)
+//        arr.add(dummy4)
+//        arr.add(dummy5)
+//        arr.add(dummy6)
+//
+//        return arr
+//    }
 
 }
 

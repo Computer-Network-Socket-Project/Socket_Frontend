@@ -1,26 +1,20 @@
 package com.yongsu.socketteamproject
 
 import android.content.DialogInterface
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameBinding
-import com.yongsu.socketteamproject.viewmodel.GameListItem
+import com.yongsu.socketteamproject.viewmodel.CreaterClientThread
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.IOException
 import java.net.Socket
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 class GameActivity : AppCompatActivity() {
 

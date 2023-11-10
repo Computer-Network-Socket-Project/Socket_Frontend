@@ -1,9 +1,8 @@
 package com.yongsu.socketteamproject.retrofit.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
-data class GameInfo(
+data class GameInfoRes(
     @SerializedName("id")
     val id: Int,
 
@@ -27,10 +26,10 @@ data class GameInfo(
     val greatNum: Int?,
 
     @SerializedName("sport_type")
-    val sportType: String?,
+    val sportType: Boolean?,
 
     @SerializedName("game_datetime")
-    val gameDateTime: Date?,
+    val gameDateTime: String?,
 
     @SerializedName("game_half")
     val gameHalf: Boolean?,

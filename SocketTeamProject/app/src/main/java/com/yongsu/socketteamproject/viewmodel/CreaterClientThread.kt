@@ -1,4 +1,4 @@
-package com.yongsu.socketteamproject
+package com.yongsu.socketteamproject.viewmodel
 
 import org.json.JSONObject
 import java.io.DataInputStream
