@@ -35,6 +35,10 @@ class GameSearchResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game_search_result)
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshData()
+        }
+
         initView()
     }
 
@@ -81,6 +85,22 @@ class GameSearchResultActivity : AppCompatActivity() {
             floatingBtn.setOnClickListener {
                 val intent = Intent(this@GameSearchResultActivity, GameActivity::class.java)
                 startActivity(intent)
+            }
+        }
+    }
+
+    private fun refreshData() {
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    gameAPI.getGameList()
+                }
+                arr.clear()
+                arr.addAll(response)
+                binding.gameRV.adapter?.notifyDataSetChanged()
+                binding.swipeRefreshLayout.isRefreshing = false
+            } catch (e: IOException) {
+                Log.e("http통신", "$e")
             }
         }
     }
