@@ -42,14 +42,14 @@ class ShowGameActivity : AppCompatActivity() {
         val gameJson = intent.getStringExtra("gameData")
         val gameData = gson.fromJson(gameJson, GameInfoRes::class.java)
 
-        if(gameData.gameProgress == 1){
-            // 이미 끝난 경기는 HTTP 통신이라서 정보 받고 끝
-            initSetHTTP(gameData)
-        }else{
-            // 진행중인 경기라면 TCP 소켓 통신으로 실시간 통신
-            initSetTCP()
-        }
+        Log.d("엥?", "${gameData.gameName}")
 
+        initSetHTTP(gameData)
+
+        if(gameData.gameProgress == 1){
+            // 진행중인 경기라면 TCP 소켓 통신으로 실시간 통신
+            //initSetTCP()
+        }
 
         initView()
     }

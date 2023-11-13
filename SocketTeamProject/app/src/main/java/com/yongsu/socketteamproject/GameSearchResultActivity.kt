@@ -27,8 +27,6 @@ class GameSearchResultActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameSearchResultBinding
     val arr = ArrayList<GameInfoRes>()
-    private val adapter = GameListAdapter(arr)
-
     private val gson: Gson = Gson()
 
     private val gameAPI = RetrofitInstance.getInstance().create(GameInterface::class.java)
@@ -42,9 +40,7 @@ class GameSearchResultActivity : AppCompatActivity() {
 
     private fun initView(){
         with(binding){
-            gameRV.adapter = adapter
-            gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
-            //gameRV.addItemDecoration(GameListAdapterDecoration())
+
 
             lifecycleScope.launch{
                 try{
@@ -53,25 +49,34 @@ class GameSearchResultActivity : AppCompatActivity() {
                         gameAPI.getGameList()
                     }
                     Log.d("http통신", "온다는 말인데...")
+                    Log.d("http통신", "Response type: ${response::class.java.simpleName}")
                     Log.d("http통신", "${response.isEmpty()}")
                     Log.d("http통신", "${response.size}")
-                    // 서버에서 받아온 값들을 모두 arr에 넣어줌
-                    // arr.addAll(response)
+                    Log.d("http통신", "${response.get(1).gameName}")
 
+                    // 서버에서 받아온 값들을 모두 arr에 넣어줌
+                    arr.addAll(response)
+
+                    val adapter = GameListAdapter(arr)
+                    gameRV.adapter = adapter
+                    gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
+                    //gameRV.addItemDecoration(GameListAdapterDecoration())
+
+                    // ShowGameActivity로 데이터 넘기기 (어차피 아이템들이 각기 다른 데이터를 가지고 있으므로 그걸 가져오는게 나을듯 )
+                    adapter.setGLClickListener(object: GameListAdapter.GameListClickListener{
+                        override fun onGameListTouch(gameListItem: GameInfoRes) {
+                            val json = gson.toJson(gameListItem)
+                            val intent = Intent(this@GameSearchResultActivity, ShowGameActivity::class.java)
+                            intent.putExtra("gameData", json)
+                            startActivity(intent)
+                        }
+                    })
                 }catch(e : IOException){
                     Log.e("http통신", "$e")
                 }
             }
 
-            // ShowGameActivity로 데이터 넘기기 (어차피 아이템들이 각기 다른 데이터를 가지고 있으므로 그걸 가져오는게 나을듯 )
-            adapter.setGLClickListener(object: GameListAdapter.GameListClickListener{
-                override fun onGameListTouch(gameListItem: GameInfoRes) {
-                    val json = gson.toJson(gameListItem)
-                    val intent = Intent(this@GameSearchResultActivity, ShowGameActivity::class.java)
-                    intent.putExtra("gameData", json)
-                    startActivity(intent)
-                }
-            })
+
 
             floatingBtn.setOnClickListener {
                 val intent = Intent(this@GameSearchResultActivity, GameActivity::class.java)
