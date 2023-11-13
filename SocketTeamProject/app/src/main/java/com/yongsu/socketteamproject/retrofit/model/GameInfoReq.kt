@@ -20,11 +20,11 @@ data class GameInfoReq(
     val team2Score: String,
 
     @SerializedName("sport_type")
-    val sportType: Boolean?,
+    val sportType: Int?,
 
     @SerializedName("game_half")
-    val gameHalf: Boolean?,
+    val gameHalf: Int?,
 
     @SerializedName("game_progress")
-    val gameProgress: Boolean?
+    val gameProgress: Int?
 )

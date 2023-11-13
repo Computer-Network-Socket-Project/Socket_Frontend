@@ -1,8 +1,10 @@
 package com.yongsu.socketteamproject.viewmodel
 
+import android.util.Log
 import org.json.JSONObject
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -13,9 +15,16 @@ class CreaterClientThread : Thread() {
     private var instream: DataInputStream? = null
 
     init {
-        socket = Socket("192.168.44.195", 9999)
-        outstream = DataOutputStream(socket!!.getOutputStream())
-        instream = DataInputStream(socket!!.getInputStream())
+        Log.d("TCP 통신", "소켓 생성 전")
+        try{
+            socket = Socket("192.168.44.114", 8888)
+            outstream = DataOutputStream(socket!!.getOutputStream())
+            instream = DataInputStream(socket!!.getInputStream())
+            Log.d("TCP 통신", "소켓 생성 후")
+        }catch(e : IOException){
+            Log.e("TCP 통신", "$e")
+        }
+
     }
 
     // 데이터 변경과정
@@ -25,19 +34,24 @@ class CreaterClientThread : Thread() {
     fun sendMatchInfo(title: String, team1: String, team2: String) {
         val json = JSONObject()
         json.put("type", "match_info")
-        json.put("title", title)
-        json.put("team1", team1)
-        json.put("team2", team2)
+        json.put("game_name", title)
+        json.put("team1_name", team1)
+        json.put("team2_name", team2)
 
         sendMessage(json.toString())
     }
 
     // 점수 업데이트
-    fun updateScore(scoreFirst: Int, scoreSecond: Int) {
+    fun updateScore(title: String, team1: String, team2: String, scoreFirst: Int, scoreSecond: Int, half: Int) {
         val json = JSONObject()
-        json.put("type", "score")
-        json.put("score", scoreFirst)
-        json.put("score", scoreSecond)
+        json.put("game_name", title)
+        json.put("team1_name", team1)
+        json.put("team2_name", team2)
+        json.put("team1_score", scoreFirst)  // 'score'를 'team1_score'로 변경
+        json.put("team2_score", scoreSecond)  // 'score'를 'team2_score'로 변경
+        json.put("sport_type", 1)
+        json.put("game_half", half)
+        json.put("game_progress", 1)
 
         sendMessage(json.toString())
     }
@@ -46,7 +60,7 @@ class CreaterClientThread : Thread() {
     fun setHalf(half: Boolean) {
         val json = JSONObject()
         json.put("type", "half")
-        json.put("half", half)
+        json.put("game_half", half)
 
         sendMessage(json.toString())
     }
@@ -61,13 +75,18 @@ class CreaterClientThread : Thread() {
     }
 
     private fun sendMessage(message: String) {
-        val data = message.toByteArray() // 데이터를 Byte 배열로 변환
-        val b1 = ByteBuffer.allocate(4) // 크기가 4인 ByteBuffer를 생성
-        b1.order(ByteOrder.LITTLE_ENDIAN)
-        b1.putInt(data.size)
-        // 내부 바이트 배열, 배열의 시작 인덱스, 전송할 바이트 수
-        outstream!!.write(b1.array(), 0, 4) // 데이터의 길이를 전송
-        outstream!!.write(data) // 실제 데이터 전송
+        Log.d("TCP 통신", "sendMessage 시작")
+        try{
+            val data = message.toByteArray() // 데이터를 Byte 배열로 변환
+            val b1 = ByteBuffer.allocate(4) // 크기가 4인 ByteBuffer를 생성
+            b1.order(ByteOrder.LITTLE_ENDIAN)
+            b1.putInt(data.size)
+            // 내부 바이트 배열, 배열의 시작 인덱스, 전송할 바이트 수
+            outstream!!.write(b1.array(), 0, 4) // 데이터의 길이를 전송
+            outstream!!.write(data) // 실제 데이터 전송
+        }catch(e : IOException){
+            Log.e("TCP 통신", "sendMessage : $e")
+        }
 
         // 위는 data와 데이터길이 등을 따로 보내는 방식
         // 아래는 한꺼번에 보내는 방식

@@ -4,9 +4,12 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,16 +20,19 @@ import com.yongsu.socketteamproject.retrofit.api.GameInterface
 import com.yongsu.socketteamproject.retrofit.model.GameInfoReq
 import com.yongsu.socketteamproject.viewmodel.CreaterClientThread
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.net.Socket
 
 class GameActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameBinding
 
-    private var isFirstHalf = true
+    private var isFirstHalf = 1
     private val isAdmin = true
     private var isSoccer = false
     private var isSave = false
@@ -34,12 +40,6 @@ class GameActivity : AppCompatActivity() {
 
     // about socket
     private lateinit var createrClientThread: CreaterClientThread
-    var mHandler: Handler? = null
-    var socket: Socket? = null
-    var outstream: DataOutputStream? = null
-    var instream: DataInputStream? = null
-    var newip: String? = "192.168.0.4"
-    var port = 9999
 
     private val MessageAdapter = MessageListAdapter()
     private val service = RetrofitInstance.getInstance().create(GameInterface::class.java)
@@ -66,22 +66,87 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
-        /*
-        createrClientThread = CreaterClientThread()
-        createrClientThread.start()
-         */
 
-        // 제목, 팀명 업데이트
-        var title = binding.titleTV.text.toString()
-        var team1 = binding.firstTeam.text.toString()
-        var team2 = binding.secondTeam.text.toString()
-        //createrClientThread.sendMatchInfo(title, team1, team2)
-
-        initBack()
-        initGameStatus()
         initMessage()
-        initScore()
+
+        val tcpConnect = lifecycleScope.launch {
+            initSetTCP()
+
+            Log.d("에러찾기", "여기냐?")
+        }
+
+
+
+        lifecycleScope.launch{
+            Log.d("에러찾기", "조인 전인데")
+            tcpConnect.join()
+            Log.d("에러찾기", "조인 후인데")
+
+            initBack()
+            initGameStatus()
+            initScore()
+
+            try{
+                binding.titleTV.addTextChangedListener(object : TextWatcher{
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        try{
+                            Log.d("에러찾기", "함수 호출 전")
+                            initSetTitle()
+                            Log.d("에러찾기", "함수 호출 후")
+                        }catch(e : IOException){
+                            Log.e("에러찾기", "들어와서 $e")
+                        }
+
+                    }
+
+                })
+            }catch(e: IOException){
+                Log.e("에러찾기", "들어오기 전에 $e")
+            }
+
+        }
+
     }
+
+    private fun initSetTitle(){
+        lifecycleScope.launch(Dispatchers.IO){
+            // 제목, 팀명 업데이트
+            var title = binding.titleTV.text.toString()
+            var team1 = binding.firstTeam.text.toString()
+            var team2 = binding.secondTeam.text.toString()
+
+            try{
+                createrClientThread.updateScore(title,
+                    team1,
+                    team2,
+                    binding.firstTeamScore.text.toString().toInt(),
+                    binding.secondTeamScore.text.toString().toInt(),
+                    isFirstHalf
+                )
+            }catch(e : IOException){
+                Log.e("에러찾기", "함수에 들어옴 : $e")
+            }
+
+        }
+    }
+
+    private suspend fun initSetTCP() = withContext(Dispatchers.IO) {
+        try{
+            createrClientThread = CreaterClientThread()
+            createrClientThread.start()
+        }catch(e : IOException){
+            Log.e("TCP 통신", "$e")
+        }
+    }
+
 
     private fun initStart(){
         lifecycleScope.launch {
@@ -111,7 +176,7 @@ class GameActivity : AppCompatActivity() {
                     binding.firstTeamScore.text.toString(),
                     binding.secondTeam.text.toString(),
                     binding.secondTeamScore.text.toString(),
-                    true, true, false)  // 원하는 데이터로 채웁니다.
+                    1, 1, 0)  // 원하는 데이터로 채웁니다.
                 val response = service.postGame(gameData)
                 Log.d("http 통신 GameActivity", "이곳은 $response")
             } catch(e: Exception) {
@@ -157,28 +222,44 @@ class GameActivity : AppCompatActivity() {
             firstTeamUp.setOnClickListener {
                 val addNum = firstTeamScore.text.toString().toInt() + 1
                 firstTeamScore.setText(addNum.toString())
+                scoreChange(firstTeamScore.text.toString().toInt(), secondTeamScore.text.toString().toInt())
             }
             firstTeamDown.setOnClickListener {
                 val addNum = firstTeamScore.text.toString().toInt() - 1
                 if(addNum >= 0){
                     firstTeamScore.setText(addNum.toString())
                 }
+                scoreChange(firstTeamScore.text.toString().toInt(), secondTeamScore.text.toString().toInt())
             }
             secondTeamUp.setOnClickListener {
                 val addNum = secondTeamScore.text.toString().toInt() + 1
                 secondTeamScore.setText(addNum.toString())
+                scoreChange(firstTeamScore.text.toString().toInt(), secondTeamScore.text.toString().toInt())
             }
             secondTeamDown.setOnClickListener {
                 val addNum = secondTeamScore.text.toString().toInt() - 1
                 if(addNum >= 0){
                     secondTeamScore.setText(addNum.toString())
                 }
+                scoreChange(firstTeamScore.text.toString().toInt(), secondTeamScore.text.toString().toInt())
             }
+        }
+    }
 
-            // 모든 팀의 점수를 update
-            val fTeamScore = firstTeamScore.text.toString().toInt()
-            val sTeamScore = secondTeamScore.text.toString().toInt()
-            //createrClientThread.updateScore(fTeamScore, sTeamScore)
+    private fun scoreChange(fTeamScore: Int, sTeamScore: Int){
+        // 모든 팀의 점수를 update
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                createrClientThread.updateScore(binding.titleTV.text.toString(),
+                    binding.firstTeam.text.toString(),
+                    binding.secondTeam.text.toString(),
+                    fTeamScore,
+                    sTeamScore,
+                    isFirstHalf
+                )
+            }catch (e : IOException){
+                Log.e("TCP 통신", "점수 : $e")
+            }
         }
     }
 
@@ -186,22 +267,52 @@ class GameActivity : AppCompatActivity() {
         with(binding){
             // 전반 후반
             firstHalfTV.setOnClickListener {
-                isFirstHalf = true
+                isFirstHalf = 1
                 gameStatusTV.text = "전반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
                 MessageAdapter.submitList(FirstDummyDate())
+
+                // 전후반 상태 전달
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        createrClientThread.updateScore(binding.titleTV.text.toString(),
+                            binding.firstTeam.text.toString(),
+                            binding.secondTeam.text.toString(),
+                            binding.firstTeamScore.text.toString().toInt(),
+                            binding.secondTeamScore.text.toString().toInt(),
+                            isFirstHalf
+                        )
+                    }catch (e : IOException){
+                        Log.e("TCP 통신", "점수 : $e")
+                    }
+                }
             }
             secondHalfTV.setOnClickListener {
-                isFirstHalf = false
+                isFirstHalf = 0
                 gameStatusTV.text = "후반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
                 MessageAdapter.submitList(SecondDummyDate())
+
+                // 전후반 상태 전달
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        createrClientThread.updateScore(binding.titleTV.text.toString(),
+                            binding.firstTeam.text.toString(),
+                            binding.secondTeam.text.toString(),
+                            binding.firstTeamScore.text.toString().toInt(),
+                            binding.secondTeamScore.text.toString().toInt(),
+                            isFirstHalf
+                        )
+                    }catch (e : IOException){
+                        Log.e("TCP 통신", "점수 : $e")
+                    }
+                }
             }
 
-            // 전후반 상태 전달
-            //createrClientThread.setHalf(isFirstHalf)
+
+
         }
     }
 
@@ -213,7 +324,7 @@ class GameActivity : AppCompatActivity() {
             manager.reverseLayout = true
             manager.stackFromEnd = true
             gameRV.layoutManager = manager
-            if(isFirstHalf){
+            if(isFirstHalf == 1){
                 MessageAdapter.submitList(FirstDummyDate())
             }else{
                 MessageAdapter.submitList(SecondDummyDate())

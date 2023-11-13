@@ -56,7 +56,6 @@ class GameSearchResultActivity : AppCompatActivity() {
                     Log.d("http통신", "Response type: ${response::class.java.simpleName}")
                     Log.d("http통신", "${response.isEmpty()}")
                     Log.d("http통신", "${response.size}")
-                    Log.d("http통신", "${response.get(1).gameName}")
 
                     // 서버에서 받아온 값들을 모두 arr에 넣어줌
                     arr.addAll(response)
