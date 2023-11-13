@@ -5,15 +5,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityShowGameBinding
+import com.yongsu.socketteamproject.retrofit.model.GameInfoRes
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 import com.yongsu.socketteamproject.viewmodel.ViewerClientThread
+import org.json.JSONObject
 
 class ShowGameActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
@@ -28,15 +32,46 @@ class ShowGameActivity : AppCompatActivity() {
     private var isSave = false
     private var whichTeam = 0
 
+    private val gson: Gson = Gson()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_show_game)
 
-        /*
+        // 게임 데이터 받아오기
+        val gameJson = intent.getStringExtra("gameData")
+        val gameData = gson.fromJson(gameJson, GameInfoRes::class.java)
+
+        if(gameData.gameProgress == 1){
+            // 이미 끝난 경기는 HTTP 통신이라서 정보 받고 끝
+            initSetHTTP(gameData)
+        }else{
+            // 진행중인 경기라면 TCP 소켓 통신으로 실시간 통신
+            initSetTCP()
+        }
+
+
+        initView()
+    }
+
+    private fun initSetHTTP(gameData: GameInfoRes){
+        with(binding){
+            titleTV.text = gameData.gameName
+            firstTeam.text = gameData.team1Name
+            secondTeam.text = gameData.team2Name
+            firstTeamScore.text = gameData.team1Score
+            secondTeamScore.text = gameData.team2Score
+            if(gameData.gameHalf == 1){
+                gameStatusTV.text = "후반전"
+            }else{
+                gameStatusTV.text = "전반전"
+            }
+        }
+    }
+
+    private fun initSetTCP(){
         val viewerThread = ViewerClientThread(this@ShowGameActivity)
         viewerThread.start()
-         */
-        initView()
     }
 
     private fun initView(){

@@ -4,14 +4,20 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameBinding
+import com.yongsu.socketteamproject.retrofit.RetrofitInstance
+import com.yongsu.socketteamproject.retrofit.api.GameInterface
+import com.yongsu.socketteamproject.retrofit.model.GameInfoReq
 import com.yongsu.socketteamproject.viewmodel.CreaterClientThread
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
+import kotlinx.coroutines.launch
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -32,16 +38,20 @@ class GameActivity : AppCompatActivity() {
     var socket: Socket? = null
     var outstream: DataOutputStream? = null
     var instream: DataInputStream? = null
-    var newip: String? = "192.168.44.195"
+    var newip: String? = "192.168.0.4"
     var port = 9999
 
     private val MessageAdapter = MessageListAdapter()
+    private val service = RetrofitInstance.getInstance().create(GameInterface::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
 
+        initStart()
+
         // 팀 선택해서 올리기
+        // 프론트에서 teamMessage.text와 messageEt.text를 합쳐서 서버에 보내야함
         binding.teamMessage.text = binding.firstTeam.text.toString()
         binding.teamMessage.setOnClickListener {
             if(whichTeam % 3 == 0){
@@ -59,7 +69,6 @@ class GameActivity : AppCompatActivity() {
         /*
         createrClientThread = CreaterClientThread()
         createrClientThread.start()
-
          */
 
         // 제목, 팀명 업데이트
@@ -74,6 +83,43 @@ class GameActivity : AppCompatActivity() {
         initScore()
     }
 
+    private fun initStart(){
+        lifecycleScope.launch {
+            try {
+                val response = service.getGame()
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        Log.d("http 통신 GameActivity", responseBody.string())
+                    } else {
+                        Log.e("http 통신 GameActivity", "Response body is null")
+                    }
+                } else {
+                    Log.e("http 통신 GameActivity", "Request failed with code: ${response.code()}")
+                }
+            } catch(e: Exception) {
+                Log.e("http 통신 GameActivity", "야호 $e")
+            }
+        }
+    }
+
+    private fun initEnd(){
+        lifecycleScope.launch {
+            try {
+                val gameData = GameInfoReq(binding.titleTV.text.toString(),
+                    binding.firstTeam.text.toString(),
+                    binding.firstTeamScore.text.toString(),
+                    binding.secondTeam.text.toString(),
+                    binding.secondTeamScore.text.toString(),
+                    true, true, false)  // 원하는 데이터로 채웁니다.
+                val response = service.postGame(gameData)
+                Log.d("http 통신 GameActivity", "이곳은 $response")
+            } catch(e: Exception) {
+                Log.e("http 통신 GameActivity", "이곳은 $e")
+            }
+        }
+    }
+
     private fun initBack(){
         with(binding){
             // 뒤로 가기
@@ -85,17 +131,17 @@ class GameActivity : AppCompatActivity() {
                 }else{      // 저장 안됨
                     AlertDialog.Builder(this@GameActivity)
                         .setTitle("${firstTeam.text} vs ${secondTeam.text}")
-                        .setMessage("중계를 등록하시겠습니까?\n(등록하지 않은 중계는 영구 삭제됩니다.)")
+                        .setMessage("중계를 종료하시겠습니까?")
                         .setPositiveButton("네", object : DialogInterface.OnClickListener{
                             override fun onClick(dialog: DialogInterface, which: Int){
-                                Toast.makeText(applicationContext, "등록되었습니다.", Toast.LENGTH_SHORT).show()
+                                initEnd()
+                                Toast.makeText(applicationContext, "중계가 등록되었습니다.", Toast.LENGTH_LONG).show()
                                 finish()
                             }
                         })
                         .setNegativeButton("아니오", object : DialogInterface.OnClickListener{
                             override fun onClick(dialog: DialogInterface, which: Int){
-                                Toast.makeText(applicationContext, "삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                                finish()
+
                             }
                         })
                         .create()

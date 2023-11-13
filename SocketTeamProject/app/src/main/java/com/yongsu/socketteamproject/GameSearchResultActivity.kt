@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.yongsu.socketteamproject.adapter.GameListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityGameSearchResultBinding
 import com.yongsu.socketteamproject.retrofit.RetrofitInstance
@@ -27,6 +28,8 @@ class GameSearchResultActivity : AppCompatActivity() {
     private lateinit var binding : ActivityGameSearchResultBinding
     val arr = ArrayList<GameInfoRes>()
     private val adapter = GameListAdapter(arr)
+
+    private val gson: Gson = Gson()
 
     private val gameAPI = RetrofitInstance.getInstance().create(GameInterface::class.java)
 
@@ -50,20 +53,24 @@ class GameSearchResultActivity : AppCompatActivity() {
                         gameAPI.getGameList()
                     }
                     Log.d("http통신", "온다는 말인데...")
+                    Log.d("http통신", "${response.isEmpty()}")
+                    Log.d("http통신", "${response.size}")
                     // 서버에서 받아온 값들을 모두 arr에 넣어줌
-                    arr.addAll(response)
+                    // arr.addAll(response)
 
                 }catch(e : IOException){
                     Log.e("http통신", "$e")
                 }
             }
 
+            // ShowGameActivity로 데이터 넘기기 (어차피 아이템들이 각기 다른 데이터를 가지고 있으므로 그걸 가져오는게 나을듯 )
             adapter.setGLClickListener(object: GameListAdapter.GameListClickListener{
                 override fun onGameListTouch(gameListItem: GameInfoRes) {
+                    val json = gson.toJson(gameListItem)
                     val intent = Intent(this@GameSearchResultActivity, ShowGameActivity::class.java)
+                    intent.putExtra("gameData", json)
                     startActivity(intent)
                 }
-
             })
 
             floatingBtn.setOnClickListener {

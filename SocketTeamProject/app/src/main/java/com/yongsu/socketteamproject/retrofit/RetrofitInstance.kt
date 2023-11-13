@@ -9,7 +9,7 @@ import java.util.Collections
 class RetrofitInstance {
     companion object{
 
-        private var BASE_URL = "http://192.168.44.218:9999/"
+        private var BASE_URL = "http://192.168.0.4:9999/"
 
         private var INSTANCE : Retrofit? = null
 

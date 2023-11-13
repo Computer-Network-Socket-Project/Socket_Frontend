@@ -15,7 +15,7 @@ class ViewerClientThread(private val activity: ShowGameActivity) : Thread() {
     private var instream: DataInputStream? = null
 
     init {
-        socket = Socket("192.168.44.195", 9999)
+        socket = Socket("192.168.44.218", 9999)
         outstream = DataOutputStream(socket!!.getOutputStream())
         instream = DataInputStream(socket!!.getInputStream())
     }

@@ -2,10 +2,7 @@ package com.yongsu.socketteamproject.retrofit.model
 
 import com.google.gson.annotations.SerializedName
 
-data class GameInfoRes(
-    @SerializedName("id")
-    val id: Int,
-
+data class GameInfoReq(
     // 나중에 에러나면 필드명이랑 매치 안되는거라 그러는듯
     @SerializedName("game_name")
     val gameName: String,
@@ -22,18 +19,12 @@ data class GameInfoRes(
     @SerializedName("team2_score")
     val team2Score: String,
 
-    @SerializedName("great_num")
-    val greatNum: Int?,
-
     @SerializedName("sport_type")
-    val sportType: Int?,
-
-    @SerializedName("game_datetime")
-    val gameDateTime: String?,
+    val sportType: Boolean?,
 
     @SerializedName("game_half")
-    val gameHalf: Int?,
+    val gameHalf: Boolean?,
 
     @SerializedName("game_progress")
-    val gameProgress: Int?
+    val gameProgress: Boolean?
 )
