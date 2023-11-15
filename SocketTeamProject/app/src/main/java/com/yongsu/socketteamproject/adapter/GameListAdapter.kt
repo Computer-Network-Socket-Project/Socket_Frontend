@@ -42,8 +42,11 @@ class GameListAdapter(private val gameList: ArrayList<GameInfoRes>) : RecyclerVi
             }else{
                 binding.ballImageView.setImageResource(R.drawable.basketball)
             }
-            if(gameListItem.gameProgress == 0){
+            // 0이면 진행 1이면 종료
+            if(gameListItem.gameProgress == 1){
                 binding.onAirView.setVisibility(View.GONE)
+            }else{
+                binding.onAirView.setVisibility(View.VISIBLE)
             }
         }
     }

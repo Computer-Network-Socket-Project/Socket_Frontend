@@ -10,14 +10,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.yongsu.socketteamproject.adapter.MessageListAdapter
 import com.yongsu.socketteamproject.databinding.ActivityShowGameBinding
 import com.yongsu.socketteamproject.retrofit.model.GameInfoRes
+import com.yongsu.socketteamproject.viewmodel.CreaterClientThread
 import com.yongsu.socketteamproject.viewmodel.MessageListItem
 import com.yongsu.socketteamproject.viewmodel.ViewerClientThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.io.IOException
 
 class ShowGameActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
@@ -26,11 +31,9 @@ class ShowGameActivity : AppCompatActivity() {
 
     private val MessageAdapter = MessageListAdapter()
 
-    private var isFirstHalf = true
-    private val isAdmin = true
-    private var isSoccer = false
-    private var isSave = false
-    private var whichTeam = 0
+    private var isFirstHalf = 0
+
+    private lateinit var viewerClientThread: ViewerClientThread
 
     private val gson: Gson = Gson()
 
@@ -42,16 +45,31 @@ class ShowGameActivity : AppCompatActivity() {
         val gameJson = intent.getStringExtra("gameData")
         val gameData = gson.fromJson(gameJson, GameInfoRes::class.java)
 
-        Log.d("엥?", "${gameData.gameName}")
-
-        initSetHTTP(gameData)
-
-        if(gameData.gameProgress == 1){
+        if(gameData.gameProgress == 0){
             // 진행중인 경기라면 TCP 소켓 통신으로 실시간 통신
-            //initSetTCP()
+            val tcpConnect = lifecycleScope.launch(Dispatchers.IO) {
+                initSetTCP()
+
+                Log.d("엥?", "여기냐?")
+            }
+
+            lifecycleScope.launch(Dispatchers.IO){
+                tcpConnect.join()
+                initSetHTTP(gameData)
+            }
+        }else{
+            initSetHTTP(gameData)
         }
 
         initView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewerClientThread.closeViewerSocket()
+        }
     }
 
     private fun initSetHTTP(gameData: GameInfoRes){
@@ -70,8 +88,17 @@ class ShowGameActivity : AppCompatActivity() {
     }
 
     private fun initSetTCP(){
-        val viewerThread = ViewerClientThread(this@ShowGameActivity)
-        viewerThread.start()
+        lifecycleScope.launch(Dispatchers.IO){
+            try {
+                Log.d("엥?", "스레드 시작 전")
+                viewerClientThread = ViewerClientThread(this@ShowGameActivity)
+                viewerClientThread.start()
+                Log.d("엥?", "스레드 시작됨")
+            }catch(e : IOException){
+                Log.e("엥?", "어디지 : $e")
+            }
+        }
+
     }
 
     private fun initView(){
@@ -84,14 +111,14 @@ class ShowGameActivity : AppCompatActivity() {
 
             // 전반 후반
             firstHalfTV.setOnClickListener {
-                isFirstHalf = true
+                isFirstHalf = 0
                 gameStatusTV.text = "전반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
                 MessageAdapter.submitList(FirstDummyDate())
             }
             secondHalfTV.setOnClickListener {
-                isFirstHalf = false
+                isFirstHalf = 1
                 gameStatusTV.text = "후반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
@@ -104,7 +131,7 @@ class ShowGameActivity : AppCompatActivity() {
             manager.reverseLayout = true
             manager.stackFromEnd = true
             gameRV.layoutManager = manager
-            if(isFirstHalf){
+            if(isFirstHalf == 0){
                 MessageAdapter.submitList(FirstDummyDate())
             }else{
                 MessageAdapter.submitList(SecondDummyDate())
@@ -118,18 +145,19 @@ class ShowGameActivity : AppCompatActivity() {
         binding.firstTeam.text = team1
         binding.secondTeam.text = team2
     }
-    fun receiveScore(firstScore: Int, secondScore: Int) {
-        binding.firstTeamScore.text = firstScore.toString()
-        binding.secondTeamScore.text = secondScore.toString()
+    fun receiveScore(firstScore: String, secondScore: String) {
+        binding.firstTeamScore.text = firstScore
+        binding.secondTeamScore.text = secondScore
     }
-    fun receiveHalfStatus(gameStatus: Boolean) {
-        if(gameStatus){
+    fun receiveHalfStatus(gameStatus: Int) {
+        if(gameStatus == 0){
+            isFirstHalf = 0
             binding.gameStatusTV.text = "전반전"
             binding.firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
             binding.secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
             MessageAdapter.submitList(FirstDummyDate())
         }else{
-            isFirstHalf = false
+            isFirstHalf = 1
             binding.gameStatusTV.text = "후반전"
             binding.firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
             binding.secondHalfTV.setBackgroundResource(R.drawable.right_round_26)

@@ -11,13 +11,13 @@ data class GameInfoReq(
     val team1Name: String,
 
     @SerializedName("team1_score")
-    val team1Score: String,
+    val team1Score: Int,
 
     @SerializedName("team2_name")
     val team2Name: String,
 
     @SerializedName("team2_score")
-    val team2Score: String,
+    val team2Score: Int,
 
     @SerializedName("sport_type")
     val sportType: Int?,

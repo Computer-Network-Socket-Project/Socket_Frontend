@@ -62,7 +62,10 @@ class GameSearchResultActivity : AppCompatActivity() {
 
                     val adapter = GameListAdapter(arr)
                     gameRV.adapter = adapter
-                    gameRV.layoutManager= LinearLayoutManager(this@GameSearchResultActivity)
+                    val manager = LinearLayoutManager(this@GameSearchResultActivity)
+                    manager.reverseLayout = true
+                    manager.stackFromEnd = true
+                    gameRV.layoutManager= manager
                     //gameRV.addItemDecoration(GameListAdapterDecoration())
 
                     // ShowGameActivity로 데이터 넘기기 (어차피 아이템들이 각기 다른 데이터를 가지고 있으므로 그걸 가져오는게 나을듯 )

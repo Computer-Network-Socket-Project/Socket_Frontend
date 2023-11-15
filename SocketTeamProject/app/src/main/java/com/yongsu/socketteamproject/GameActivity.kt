@@ -32,7 +32,7 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityGameBinding
 
-    private var isFirstHalf = 1
+    private var isFirstHalf = 0
     private val isAdmin = true
     private var isSoccer = false
     private var isSave = false
@@ -104,9 +104,55 @@ class GameActivity : AppCompatActivity() {
                         }catch(e : IOException){
                             Log.e("에러찾기", "들어와서 $e")
                         }
+                    }
+                })
+            }catch(e: IOException){
+                Log.e("에러찾기", "들어오기 전에 $e")
+            }
+
+            try{
+                binding.firstTeam.addTextChangedListener(object : TextWatcher{
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
                     }
 
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        try{
+                            Log.d("에러찾기", "함수 호출 전")
+                            initSetTitle()
+                            Log.d("에러찾기", "함수 호출 후")
+                        }catch(e : IOException){
+                            Log.e("에러찾기", "들어와서 $e")
+                        }
+                    }
+                })
+            }catch(e: IOException){
+                Log.e("에러찾기", "들어오기 전에 $e")
+            }
+
+            try{
+                binding.secondTeam.addTextChangedListener(object : TextWatcher{
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        try{
+                            Log.d("에러찾기", "함수 호출 전")
+                            initSetTitle()
+                            Log.d("에러찾기", "함수 호출 후")
+                        }catch(e : IOException){
+                            Log.e("에러찾기", "들어와서 $e")
+                        }
+                    }
                 })
             }catch(e: IOException){
                 Log.e("에러찾기", "들어오기 전에 $e")
@@ -169,20 +215,27 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun initEnd(){
-        lifecycleScope.launch {
+        val endClick = lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val gameData = GameInfoReq(binding.titleTV.text.toString(),
                     binding.firstTeam.text.toString(),
-                    binding.firstTeamScore.text.toString(),
+                    binding.firstTeamScore.text.toString().toInt(),
                     binding.secondTeam.text.toString(),
-                    binding.secondTeamScore.text.toString(),
-                    1, 1, 0)  // 원하는 데이터로 채웁니다.
+                    binding.secondTeamScore.text.toString().toInt(),
+                    1, 1, 1)  // 원하는 데이터로 채웁니다.
                 val response = service.postGame(gameData)
                 Log.d("http 통신 GameActivity", "이곳은 $response")
             } catch(e: Exception) {
                 Log.e("http 통신 GameActivity", "이곳은 $e")
             }
         }
+
+        lifecycleScope.launch(Dispatchers.IO){
+            endClick.join()
+            //Toast.makeText(applicationContext, "중계가 등록되었습니다.", Toast.LENGTH_LONG).show()
+            finish()
+        }
+
     }
 
     private fun initBack(){
@@ -199,9 +252,16 @@ class GameActivity : AppCompatActivity() {
                         .setMessage("중계를 종료하시겠습니까?")
                         .setPositiveButton("네", object : DialogInterface.OnClickListener{
                             override fun onClick(dialog: DialogInterface, which: Int){
-                                initEnd()
-                                Toast.makeText(applicationContext, "중계가 등록되었습니다.", Toast.LENGTH_LONG).show()
-                                finish()
+                                val closeSocket = lifecycleScope.launch(Dispatchers.IO){
+                                    createrClientThread.closeCreaterSocket()
+                                }
+                                lifecycleScope.launch(Dispatchers.IO){
+                                    closeSocket.join()
+                                    initEnd()
+                                }
+
+
+
                             }
                         })
                         .setNegativeButton("아니오", object : DialogInterface.OnClickListener{
@@ -267,7 +327,7 @@ class GameActivity : AppCompatActivity() {
         with(binding){
             // 전반 후반
             firstHalfTV.setOnClickListener {
-                isFirstHalf = 1
+                isFirstHalf = 0
                 gameStatusTV.text = "전반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26_white)
@@ -289,7 +349,7 @@ class GameActivity : AppCompatActivity() {
                 }
             }
             secondHalfTV.setOnClickListener {
-                isFirstHalf = 0
+                isFirstHalf = 1
                 gameStatusTV.text = "후반전"
                 firstHalfTV.setBackgroundResource(R.drawable.left_round_26_white)
                 secondHalfTV.setBackgroundResource(R.drawable.right_round_26)
