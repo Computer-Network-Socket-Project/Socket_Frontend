@@ -7,6 +7,7 @@ import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
@@ -34,7 +35,7 @@ class GameActivity : AppCompatActivity() {
 
     private var isFirstHalf = 0
     private val isAdmin = true
-    private var isSoccer = false
+    private var isBasket = 0
     private var isSave = false
     private var whichTeam = 0
 
@@ -85,6 +86,7 @@ class GameActivity : AppCompatActivity() {
             initBack()
             initGameStatus()
             initScore()
+            initSetSport()
 
             try{
                 binding.titleTV.addTextChangedListener(object : TextWatcher{
@@ -162,6 +164,56 @@ class GameActivity : AppCompatActivity() {
 
     }
 
+    private fun initSetSport(){
+        // 메뉴 누르면 농구, 축구 선택창 뜸
+        binding.menuView.setOnClickListener {
+            binding.sportLayout.visibility = View.VISIBLE
+        }
+
+        // 농구 누르면
+        binding.sportBascket.setOnClickListener {
+            binding.sportLayout.visibility = View.GONE
+            // sport를 1로 설정
+            lifecycleScope.launch(Dispatchers.IO){
+                try{
+                    createrClientThread.updateScore(binding.titleTV.text.toString(),
+                        binding.firstTeam.text.toString(),
+                        binding.secondTeam.text.toString(),
+                        binding.firstTeamScore.text.toString().toInt(),
+                        binding.secondTeamScore.text.toString().toInt(),
+                        isFirstHalf,
+                        1
+                    )
+                }catch(e : IOException){
+                    Log.e("에러찾기", "함수에 들어옴 : $e")
+                }
+
+            }
+        }
+
+        // 축구 누르면
+        binding.sportSoccer.setOnClickListener {
+            binding.sportLayout.visibility = View.GONE
+
+            // sport를 0으로 설정
+            lifecycleScope.launch(Dispatchers.IO){
+                try{
+                    createrClientThread.updateScore(binding.titleTV.text.toString(),
+                        binding.firstTeam.text.toString(),
+                        binding.secondTeam.text.toString(),
+                        binding.firstTeamScore.text.toString().toInt(),
+                        binding.secondTeamScore.text.toString().toInt(),
+                        isFirstHalf,
+                        0
+                    )
+                }catch(e : IOException){
+                    Log.e("에러찾기", "함수에 들어옴 : $e")
+                }
+
+            }
+        }
+    }
+
     private fun initSetTitle(){
         lifecycleScope.launch(Dispatchers.IO){
             // 제목, 팀명 업데이트
@@ -175,7 +227,8 @@ class GameActivity : AppCompatActivity() {
                     team2,
                     binding.firstTeamScore.text.toString().toInt(),
                     binding.secondTeamScore.text.toString().toInt(),
-                    isFirstHalf
+                    isFirstHalf,
+                    isBasket
                 )
             }catch(e : IOException){
                 Log.e("에러찾기", "함수에 들어옴 : $e")
@@ -315,7 +368,8 @@ class GameActivity : AppCompatActivity() {
                     binding.secondTeam.text.toString(),
                     fTeamScore,
                     sTeamScore,
-                    isFirstHalf
+                    isFirstHalf,
+                    isBasket
                 )
             }catch (e : IOException){
                 Log.e("TCP 통신", "점수 : $e")
@@ -341,7 +395,8 @@ class GameActivity : AppCompatActivity() {
                             binding.secondTeam.text.toString(),
                             binding.firstTeamScore.text.toString().toInt(),
                             binding.secondTeamScore.text.toString().toInt(),
-                            isFirstHalf
+                            isFirstHalf,
+                            isBasket
                         )
                     }catch (e : IOException){
                         Log.e("TCP 통신", "점수 : $e")
@@ -363,7 +418,8 @@ class GameActivity : AppCompatActivity() {
                             binding.secondTeam.text.toString(),
                             binding.firstTeamScore.text.toString().toInt(),
                             binding.secondTeamScore.text.toString().toInt(),
-                            isFirstHalf
+                            isFirstHalf,
+                            isBasket
                         )
                     }catch (e : IOException){
                         Log.e("TCP 통신", "점수 : $e")

@@ -47,7 +47,7 @@ class CreaterClientThread : Thread() {
     }
 
     // 점수 업데이트
-    fun updateScore(title: String, team1: String, team2: String, scoreFirst: Int, scoreSecond: Int, half: Int) {
+    fun updateScore(title: String, team1: String, team2: String, scoreFirst: Int, scoreSecond: Int, half: Int, sport: Int) {
         val json = JSONObject()
         json.put("type", "creater") // creater인지 viewer인지
         json.put("action", "update_data")   // 어떤 작업을 하라고 보낼건지
@@ -57,7 +57,7 @@ class CreaterClientThread : Thread() {
         json.put("team2_name", team2)
         json.put("team1_score", scoreFirst)  // 'score'를 'team1_score'로 변경
         json.put("team2_score", scoreSecond)  // 'score'를 'team2_score'로 변경
-        json.put("sport_type", 0)
+        json.put("sport_type", sport)   // 0이 축구, 1이 농구
         json.put("game_half", half)
         json.put("game_progress", 0)
 
