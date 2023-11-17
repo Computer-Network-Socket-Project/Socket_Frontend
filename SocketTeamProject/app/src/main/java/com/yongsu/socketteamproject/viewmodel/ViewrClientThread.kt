@@ -32,10 +32,32 @@ class ViewerClientThread(private val activity: ShowGameActivity) : Thread() {
 
     fun closeViewerSocket() {
         try {
-            outstream?.close()
-            instream?.close()
-            socket?.close()
-            Log.d("엥?", "소켓 닫기 성공")
+            val threadKilling = Thread{
+                Log.d("엥?", "닫을거에요")
+                val json = JSONObject()
+                json.put("type", "viewer")
+                json.put("action", "viewer_killing")
+                val data = json.toString().toByteArray() // 데이터를 Byte 배열로 변환
+                val b1 = ByteBuffer.allocate(4) // 크기가 4인 ByteBuffer를 생성
+                b1.order(ByteOrder.LITTLE_ENDIAN)
+                b1.putInt(data.size)
+                // 내부 바이트 배열, 배열의 시작 인덱스, 전송할 바이트 수
+                outstream!!.write(b1.array(), 0, 4) // 데이터의 길이를 전송
+                outstream!!.write(data) // 실제 데이터 전송
+                Log.d("엥?", "닫으라고 보냈어요")
+            }
+
+            Thread{
+                threadKilling.start()
+                threadKilling.join()
+                outstream?.close()
+                instream?.close()
+                socket?.close()
+
+                Log.d("엥?", "소켓 닫기 성공")
+            }.start()
+
+
         } catch (e: IOException) {
             Log.e("엥?", "소켓 닫기 에러: $e")
         }

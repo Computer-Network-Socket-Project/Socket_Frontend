@@ -94,6 +94,7 @@ class CreaterClientThread : Thread() {
         }
     }
 
+
     private fun sendMessage(message: String) {
 
         // 서버에서 데이터를 보내라는 신호를 받아서 플래그가 세워진 경우

@@ -67,9 +67,9 @@ class ShowGameActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewerClientThread.closeViewerSocket()
-        }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            viewerClientThread.closeViewerSocket()
+//        }
     }
 
     private fun initSetHTTP(gameData: GameInfoRes){
@@ -106,7 +106,16 @@ class ShowGameActivity : AppCompatActivity() {
 
             // 뒤로가기
             backView.setOnClickListener {
-                finish()
+                val killThreading = lifecycleScope.launch(Dispatchers.IO) {
+                    viewerClientThread.closeViewerSocket()
+                }
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    killThreading.start()
+                    killThreading.join()
+                    finish()
+                }
+
             }
 
             // 전반 후반
