@@ -22,7 +22,7 @@ class CreaterClientThread : Thread() {
     init {
         Log.d("TCP 통신", "소켓 생성 전")
         try{
-            socket = Socket("192.168.0.12", 8888)
+            socket = Socket("192.168.0.3", 8888)
             outstream = DataOutputStream(socket!!.getOutputStream())
             instream = DataInputStream(socket!!.getInputStream())
             Log.d("TCP 통신", "소켓 생성 후")
@@ -51,6 +51,7 @@ class CreaterClientThread : Thread() {
         val json = JSONObject()
         json.put("type", "creater") // creater인지 viewer인지
         json.put("action", "update_data")   // 어떤 작업을 하라고 보낼건지
+        json.put("viewer_on", 1)    // 1을 보내면 데이터를 서버에서 Viewer로 보내라
         json.put("game_name", title)
         json.put("team1_name", team1)
         json.put("team2_name", team2)
@@ -140,6 +141,7 @@ class CreaterClientThread : Thread() {
                     val json = JSONObject()
                     json.put("type", "creater")
                     json.put("action", "update_request")
+                    json.put("viewer_on", 0)
                     val send_message = json.toString().toByteArray()
                     val b1 = ByteBuffer.allocate(4)
                     b1.order(ByteOrder.LITTLE_ENDIAN)
