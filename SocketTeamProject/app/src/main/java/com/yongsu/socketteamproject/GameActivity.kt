@@ -458,13 +458,13 @@ class GameActivity : AppCompatActivity() {
         val dummy7 = MessageListItem(7, "라온, 피즈의 앤드원!!")
 
         val arr = ArrayList<MessageListItem>()
-        arr.add(dummy1)
-        arr.add(dummy2)
-        arr.add(dummy3)
-        arr.add(dummy4)
-        arr.add(dummy5)
-        arr.add(dummy6)
-        arr.add(dummy7)
+//        arr.add(dummy1)
+//        arr.add(dummy2)
+//        arr.add(dummy3)
+//        arr.add(dummy4)
+//        arr.add(dummy5)
+//        arr.add(dummy6)
+//        arr.add(dummy7)
 
         return arr
     }
@@ -479,13 +479,13 @@ class GameActivity : AppCompatActivity() {
         val dummy7 = MessageListItem(7, "라온, 리볼버의 와웅")
 
         val arr = ArrayList<MessageListItem>()
-        arr.add(dummy1)
-        arr.add(dummy2)
-        arr.add(dummy3)
-        arr.add(dummy4)
-        arr.add(dummy5)
-        arr.add(dummy6)
-        arr.add(dummy7)
+//        arr.add(dummy1)
+//        arr.add(dummy2)
+//        arr.add(dummy3)
+//        arr.add(dummy4)
+//        arr.add(dummy5)
+//        arr.add(dummy6)
+//        arr.add(dummy7)
 
         return arr
     }

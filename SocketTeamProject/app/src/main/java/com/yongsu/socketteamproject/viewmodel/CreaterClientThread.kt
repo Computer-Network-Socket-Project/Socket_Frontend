@@ -22,7 +22,7 @@ class CreaterClientThread : Thread() {
     init {
         Log.d("TCP 통신", "소켓 생성 전")
         try{
-            socket = Socket("192.168.0.3", 8888)
+            socket = Socket("localhost", 8888)
             outstream = DataOutputStream(socket!!.getOutputStream())
             instream = DataInputStream(socket!!.getInputStream())
             Log.d("TCP 통신", "소켓 생성 후")

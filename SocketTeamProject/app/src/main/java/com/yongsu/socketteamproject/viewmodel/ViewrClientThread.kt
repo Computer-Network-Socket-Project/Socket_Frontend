@@ -20,7 +20,7 @@ class ViewerClientThread(private val activity: ShowGameActivity) : Thread() {
         Log.d("엥?", "소켓 생성 전")
         try{
             Log.d("엥?", "소켓 생성 중")
-            socket = Socket("192.168.0.3", 8888)
+            socket = Socket("localhost", 8888)
             outstream = DataOutputStream(socket!!.getOutputStream())
             instream = DataInputStream(socket!!.getInputStream())
             Log.d("엥?", "소켓 생성 후")
